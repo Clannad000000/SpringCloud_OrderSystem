@@ -1,0 +1,31 @@
+server:
+  port: 9527
+spring:
+  application:
+    name: zuul
+
+eureka:
+  client:
+    service-url:
+      # 表示eureka client发送心跳给server端的频率。如果在leaseExpirationDurationInSeconds后server端没收到client的心跳，则摘除该instance。默认30s
+      lease-renewal-interval-in-seconds: 5
+      # 表示eureka server至上一次收到client的心跳之后，等待下一次心跳的超时时间，在这个时间内若没收到下一次心跳，则将移除该instance。默认90s
+      lease-expiration-duration-in-seconds: 10
+      defaultZone: http://localhost:9900/eureka/
+  instance:
+    instance-id: zuul-9527
+    prefer-ip-address: true
+
+#zuul:
+#  routes: # 隐藏真实的服务名   以后都用9527统一对外提供接口    localhost:9527/mymenu/menu/getPort
+#    mymenu.serviceId: menu
+#    mymenu.path: /mymenu/**   # 相当于所有的微服务前都加了一个前缀
+#
+#    myclient.serviceId: client
+#    myclient.path: /**   # 访问localhost:9527/login.html正常 但是登录404(localhost:9527/account/login)
+#
+#    eureka-feign:
+#      serviceId: client # 对应服务名称
+#      path: /**
+#  ignored-services: menu, user # 真实的按照服务名路径不能访问了   localhost:9527/menu/menu/getPort   第一个menu是微服务名，第二个是requestmapping
+

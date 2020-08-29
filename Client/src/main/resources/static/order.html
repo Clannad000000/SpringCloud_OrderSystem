@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-container" style="width: 960px;height: 600px;margin-top: 0px;padding-top: 60px;">
+
+    <div style="margin-left: 460px; width: 300px;">
+        <a href="index.html">首页</a>&nbsp;&nbsp;|&nbsp;&nbsp;欢迎回来！<a href="order.html" id="nickname"></a><a href="/client/account/logout/user">&nbsp;&nbsp;&nbsp;<button class="layui-btn layui-btn-warm layui-btn-radius">退出</button></a>
+    </div>
+
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+
+
+</div>
+</body>
+</html>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="/layui/layui.js" charset="utf-8"></script>
+<script>
+    /*获取名称*/
+    $.ajax({
+        url:"/client/account/getUsername",
+        type:"GET",
+        success:function (result) {
+            $("#nickname").text(result.extend.user.nickname)
+        }
+    });
+    /*获取订单信息*/
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'/client/order/findByUid'
+            ,title: '订单列表'
+            ,cols: [
+                [
+                    {field:'id', width:100, title: '编号', sort: true}
+                    , {
+                    field: 'name', width: 200, title: '菜品', templet: function (data) {
+                        return data.menu.name
+                    }
+                }
+                    , {
+                    field: 'price', width: 100, title: '单价', templet: function (data) {
+                        return data.menu.price
+                    }
+                }
+                    ,{field:'flavor', width:100, title: '口味',templet:function(data){
+                        return data.menu.flavor
+                    }
+                }
+                    ,{field:'date',width:300,  title: '下单时间', templet:function (data) {
+                        var date1 = new Date(data.date).toJSON();
+                        var date = new Date(+new Date(date1)+8*3600*1000).toISOString().replace(/T/g,' ').replace(/\.[\d]{3}Z/,'');
+                        return date;
+                    }}
+                    ,{field:'state', width:160, title: '订单状态',templet:function(data){
+                        var result = "";
+                        if (data.state==0){
+                            result = "未派送";
+                        }else if (data.state==1){
+                            result = "已派送";
+                        }
+                        return result
+                    }
+                }
+                ]
+            ]
+            ,page: true
+        });
+    });
+</script>
+<script>
+    //二级菜单联动
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+</script>

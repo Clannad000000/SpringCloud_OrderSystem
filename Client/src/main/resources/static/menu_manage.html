@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-container" style="width: 800px;height: 600px;margin-top: 0px;padding-top: 60px;">
+
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+
+
+    <!--模仿bootstrap的模态框-->
+    <div id="motaikunag" style="display: none;">
+        <form class="layui-form" action="">
+            <input name="id" type="hidden" id="mid"/>
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" id="mname" required  lay-verify="required" placeholder="请输入菜名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">价格</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="price" id="mprice" required lay-verify="required" placeholder="请输入价格" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">口味</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="flavor" id="mflavor" required lay-verify="required" placeholder="请输入口味" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类</label>
+                <div class="layui-input-inline">
+                    <select name="type.id" lay-verify="required">
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+</div>
+
+
+
+</body>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="update">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script  src="layui/layui.js" charset="utf-8"></script>
+<script>
+    /*菜单列表*/
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'/client/menu/getMenus'
+            ,title: '菜单列表'
+            ,cols: [
+                [
+                    {field:'id', width:100, title: '编号', sort: true}
+                    ,{field:'name', width:200, title: '菜品'}
+                    ,{field:'price', width:100, title: '单价'}
+                    ,{field:'flavor', width:100, title: '口味'}
+                    ,{field:'type',width:100,  title: '分类',templet:function(data){
+                        return data.type.name
+                    }
+                }
+                    ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:130}
+                ]
+            ]
+            ,page: true
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'update'){
+                /*查询修改菜品所需信息*/
+                queryMenu(data.id);
+                //菜品修改模态框
+                var update = layui.use(['layer'],function () {
+                    var layer = layui.layer,$=layui.$;
+                    layer.open({
+                        type:1,                     //类型
+                        area:['500px','500px'],     //定义宽和高
+                        title:'菜品修改',           //题目
+                        content: $('#motaikunag'), //打开的内容
+                        btn: ['确认修改', '取消'],
+                        yes: function (index, layero) {
+                            $.ajax({
+                                url:"/client/menu/update",
+                                type:"POST",
+                                data:$("#motaikunag form").serialize(),
+                                success : function (data) {
+                                    alert(data.extend.msg);
+                                    window.location.reload();
+                                    layer.close(update);
+                                }
+                            });
+                        }
+                    });
+                });
+            }else if(obj.event === 'del'){
+                layer.confirm('确定要删除吗？', function(index){
+                    $.ajax({
+                        url: "/client/menu/deleteById/"+data.id,
+                        type: "get",
+                        success: function(){
+                            alert("删除成功");
+                            window.location.href="index.html";
+                        }
+                    });
+                    layer.close(menu_manage);
+                })
+            }
+        });
+    });
+
+
+    /*查询修改菜品所需信息*/
+    function queryMenu(id) {
+        layui.use('form', function () {
+            var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+            $("#motaikunag select").empty();
+            /*查询所有菜品分类*/
+            $.ajax({
+                url: "/client/menu/findTypes",
+                type: "GET",
+                success: function (result) {
+                    var type = result.extend.types;
+                    $.each(type, function (index, item) {
+                        $("<option></option>").append(item.name).attr("value", item.id).appendTo("#motaikunag select");
+                    });
+                    //但是，如果你的HTML是动态生成的，自动渲染就会失效
+                    //因此你需要在相应的地方，执行下述方法来手动渲染，跟这类似的还有 element.init();
+                    form.render();
+                }
+            });
+            /*查询单个菜品信息*/
+            $.ajax({
+                url: "/client/menu/findById/" + id,
+                type: "GET",
+                success: function (result) {
+                    var menu = result.extend.oneMenu;
+                    $("#mid").val(menu.id);
+                    $("#mname").val(menu.name);
+                    $("#mprice").val(menu.price);
+                    $("#mflavor").val(menu.flavor);
+                    $("#motaikunag select").val([menu.type.id]);
+                    form.render();
+                }
+            });
+        });
+    }
+
+</script>
+<script>
+    //二级菜单联动
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
+</script>

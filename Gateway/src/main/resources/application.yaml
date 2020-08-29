@@ -1,0 +1,40 @@
+server:
+  port: 9999
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: menu_route
+          uri: http://localhost:9902/
+          predicates:
+            - Path=/menu/**
+
+        - id: account_route
+          uri: http://localhost:9905/
+          predicates:
+            - Path=/account/**
+
+        - id: order_route
+          uri: http://localhost:9901/
+          predicates:
+            - Path=/order/**
+
+        - id: user_route
+          uri: http://localhost:9904/
+          predicates:
+            - Path=/user/**
+
+        - id: client_route
+          uri: http://localhost:9903/
+          predicates:  # 断言
+            - Path=/client/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9900/eureka/
+  instance:
+    instance-id: gateway-9999
+    prefer-ip-address: true

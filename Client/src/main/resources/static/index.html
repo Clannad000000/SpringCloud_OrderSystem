@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-container" style="width: 700px;height: 600px;margin-top: 0px;padding-top: 60px;">
+
+    <div style="margin-left: 460px; width: 200px;">
+        欢迎回来！<a href="order.html" id="nickname"></a>
+        <a href="/client/account/logout/user">&nbsp;&nbsp;&nbsp;<button class="layui-btn layui-btn-warm layui-btn-radius">退出</button></a>
+    </div>
+
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+
+</div>
+
+</body>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="order">订购</a>
+</script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script  src="layui/layui.js" charset="utf-8"></script>
+<script>
+    /*获取名称*/
+    $.ajax({
+        url:"/client/account/getUsername",
+        type:"GET",
+        success:function (result) {
+            $("#nickname").text(result.extend.user.nickname)
+        }
+    });
+
+    /*菜单列表*/
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'/client/menu/getMenus'
+            ,title: '菜单列表'
+            ,cols: [
+                [
+                    {field:'id', width:100, title: '编号', sort: true}
+                    ,{field:'name', width:200, title: '菜品'}
+                    ,{field:'price', width:100, title: '单价'}
+                    ,{field:'flavor', width:100, title: '口味'}
+                    ,{field:'tid',width:100,  title: '分类',templet:function(data){
+                        return data.type.name
+                    }
+                }
+                    ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:70}
+                ]
+            ]
+            ,page: true
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'order'){
+                $.ajax({
+                    url:"/client/order/save/"+data.id,
+                    type: "POST",
+                    success:function (result) {
+                        alert(result.msg);
+                        window.location.href="order.html"
+                    }
+                });
+            }
+        });
+    });
+</script>
+<script>
+    //二级菜单联动
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
+</script>

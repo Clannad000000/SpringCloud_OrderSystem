@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet"  href="/layui/css/layui.css" media="all">
+</head>
+<body>
+    <div class="layui-container" style="width: 500px;height: 330px;margin-top: 130px;border: 1px solid #009688;padding-top: 60px;border-radius: 15px">
+        <form class="layui-form" action="/client/account/login" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-inline">
+                    <input type="text" name="username" id="username" lay-verify="username" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-inline">
+                    <input type="password" name="password" id="password" lay-verify="password" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">单选框</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="type" value="user" title="用户" checked="">
+                    <input type="radio" name="type" value="admin" title="管理员">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" style="margin-left: 160px;">登陆</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script  src="layui/layui.js" charset="utf-8"></script>
+
+<script>
+    layui.use(['form'], function(){
+        var form = layui.form;
+        //自定义验证规则
+        form.verify({
+            username: function(value){
+                if(value.length == 0){
+                    return '用户名不能为空';
+                }
+            }
+            ,password: [/(.+){6,12}$/, '密码必须6到12位']
+        });
+        /*//监听提交
+        form.on('submit(formDemo)', function(data){
+            $.ajax({
+                url:"/account/login",
+                type:"POST",
+                data:{username:$("#username").val(),password:$("#password").val(),type:$("input:radio:checked").val() },
+                success:function (result) {
+                    pageJump(result);
+                }
+            });
+            return false;
+        });*/
+    });
+
+    /*//页面跳转
+    function pageJump(result) {
+        if (result.code==100){
+            if (result.extend.type==1){
+                window.location.href="menu_manage.html"
+            }else if (result.extend.type==2) {
+            }
+        }else {
+            window.location.href="login.html"
+        }
+    }*/
+</script>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zcy.dao.OrderDao">
+
+    <resultMap id="orderMenuMap" type="com.zcy.entity.Order">
+        <id property="id" column="id"/>
+        <result property="date" column="date"/>
+        <result property="state" column="state"/>
+        <association property="menu" javaType="Menu">
+            <result property="id" column="mid"></result>
+            <result property="name" column="mname"></result>
+            <result property="price" column="price"></result>
+            <result property="flavor" column="flavor"></result>
+        </association>
+        <association property="user" javaType="User">
+            <result property="nickname" column="nickname"></result>
+            <result property="telephone" column="telephone"></result>
+            <result property="address" column="address"></result>
+        </association>
+    </resultMap>
+
+    <select id="findByUid" resultMap="orderMenuMap">
+        SELECT o.id, o.mid, o.date, o.state, m.name mname, m.price, m.flavor FROM t_order o
+        LEFT JOIN t_menu m ON o.mid=m.id
+        WHERE o.uid=#{uid}
+        limit #{start}, #{row}
+	</select>
+
+    <select id="findByState" resultMap="orderMenuMap">
+        SELECT o.id, o.mid, o.date, o.state, m.name mname, m.price, m.flavor, u.nickname, u.telephone, u.address FROM t_order o
+        LEFT JOIN t_menu m ON o.mid=m.id
+        LEFT JOIN t_user u ON o.uid=u.id
+        WHERE o.state=0
+        LIMIT #{start}, #{row}
+    </select>
+
+
+</mapper>

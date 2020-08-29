@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet"  href="/layui/css/layui.css" media="all">
+</head>
+<body class="layui-layout-body">
+<div class="layui-container" style="margin-top: 50px;width: 1000px;">
+
+    <table class="layui-hide" id="test" style="width: 300px" lay-filter="test"></table>
+    <!--<button id="user_save">添加用户</button>-->
+
+    <!--&lt;!&ndash;模仿bootstrap的模态框&ndash;&gt;
+    <div id="motaikunag" style="display: none;">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">账号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="username" id="username" required  lay-verify="required" placeholder="请输入账号" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="password" id="password" required  lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">昵称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="nickname" id="nickname" required  lay-verify="required" placeholder="请输入昵称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">性别</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="gender" value="男" title="男" checked>
+                    <input type="radio" name="gender" value="女" title="女">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">电话号码</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="telephone" id="telephone" required lay-verify="required" placeholder="请输入电话号码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">地址</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="address" id="address" required lay-verify="required" placeholder="请输入地址" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </form>
+    </div>-->
+
+</div>
+</body>
+</html>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script  src="layui/layui.js" charset="utf-8"></script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:'/client/user/findAll'
+            ,title: '用户列表'
+            ,cols: [
+                [
+                    {field:'id', width:70, title: '编号', sort: true}
+                    ,{field:'username', width:100, title: '用户名'}
+                    ,{field:'nickname', width:100, title: '昵称'}
+                    ,{field:'gender', width:70, title: '性别'}
+                    ,{field:'telephone', width:160, title: '联系电话'}
+                    ,{field:'registerdate', width:220, title: '注册日期'}
+                    ,{field:'address', width:200, title: '地址'}
+                    ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:80}
+                ]
+            ]
+            ,page: true
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('确定要删除吗？', function(index){
+                    window.location.href="/client/user/deleteById/"+data.id;
+                    layer.close(index);
+                });
+            }
+        });
+    });
+
+    //添加模态框
+    /*$("#user_save").click(function () {
+        var useradd = layui.use(['layer'],function () {
+            var layer = layui.layer,$=layui.$;
+            layer.open({
+                type:1,                     //类型
+                area:['400px','420px'],     //定义宽和高
+                title:'用户添加',           //题目
+                content: $('#motaikunag'), //打开的内容
+                btn: ['确认添加', '取消'],
+                yes: function (index, layero) {
+                    $.ajax({
+                        url:"/user/save",
+                        type:"POST",
+                        data:$("#motaikunag form").serialize(),
+                        success : function (result) {
+                            alert(result.msg);
+                            window.location.reload();
+                            layer.close(useradd);
+                        }
+                    });
+                }
+            });
+        });
+    });*/
+</script>
+<script>
+    //二级菜单联动
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+</script>
